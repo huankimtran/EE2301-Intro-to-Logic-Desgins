@@ -29,7 +29,15 @@ for i in range(2**n):
                     xnf=xnf+Num2Let(j)+'&'
             if xnf[-1]=='&':
                 xnf=xnf[:len(xnf)-1]
+#Print out using python logic notation
 print(xnf)
 print()
 print()
+#Print out using notation of site
+#http://turner.faculty.swau.edu/mathematics/materialslibrary/truth/
+#So that user can copy paste and double check
 print(xnf.replace('^','#'))
+#write the notation out to file in case user cannot copy from the terminal window
+a=open('TruthTable2XNF.txt','w')
+a.write(xnf.replace('^','#'))
+a.close()
