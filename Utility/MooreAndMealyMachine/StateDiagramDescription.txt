@@ -1,0 +1,29 @@
+Machine type (Moore/Mealy)
+Number of Input #X
+Number of output #Z
+Number of States
+============================Down here is state description=================
+=======For Moore==============
+State index
+(Next State index(decimal)) PairInput1Input2(binary) PairInput1Input2(binary) 
+(Next State index(decimal)) PairInput1Input2(binary) PairInput1Input2(binary) 
+OutputOfThisState
+State index
+(Next State index(decimal)) PairInput1Input2(binary) PairInput1Input2
+(Next State index(decimal)) PairInput1Input2(binary) PairInput1Input2
+OutputOfThisState
+======For Mealy==============
+State index
+(Next State index(decimal)) PairInput1Input2,Output1Output1(binary)  PairInput1Input2,Output1Output1(binary) 
+(Next State index(decimal)) PairInput1Input2,Output1Output1(binary)  PairInput1Input2,Output1Output1(binary) 
+State index
+(Next State index(decimal)) PairInput1Input2,Output1Output1(binary)  PairInput1Input2,Output1Output1(binary) 
+(Next State index(decimal)) PairInput1Input2,Output1Output1(binary)  PairInput1Input2,Output1Output1(binary) 
+==============================
+Test input sequence
+Simulate Output1
+Simulate Output2
+
+Outut
+Combinational Logic
+Kmap
