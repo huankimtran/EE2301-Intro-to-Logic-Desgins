@@ -53,7 +53,12 @@ class MealyStateDiagram:
 				Dictionary(key(bitstring(Bit0Bit1..BitNInputt0Input1..InputN)=>value(bitN+='0' or '1' or 'x'(don't care)))
 
 	"""
-	def __init__(self,fileName):
+	def __init__(self,fileName,printSolved=True):
+			"""
+				Initialized an object
+				if printSolved=True => solve the state diagram and print out expression
+				else printSolved=False => solve the state diagram but don't print out anythng
+			"""
 			self._OutPrefix='Z'					# The prefix of output bits (Z0,Z1,..)
 			self._InpPrefix='X'					# The prefix of input bits (X0,X1,..)
 			self._IntBitPrefix='D'				# The prefix of internal bits (D0,D1,D2...) 
@@ -64,14 +69,59 @@ class MealyStateDiagram:
 			self._numIntBit=0					# Number of internal bit to represent state
 			self._StateBank={}					# The collection of state object
 			self._IntBitTTb=[]					# The collection of internal bit next state truth table
+			self._OutBitTTb=[]					# The collection of otuput bit truth table
 			self._MainTTb={}					# The main truth table where left side are current state
-												# and right side are next state of each bit
-			try:
-				self.parseNBuildStateBank(fileName)	# Build the StateBank
-				self.buildMainTTb()					# Build the main truth table for all bit
-				self.buildIntBitTTb()				# Built the truth table for each bit
-			except ValueError as e:
-				print('Some error encountered:'+str(e))
+												# and right side are next state of each bit and the ouput bits
+												# Ex: D0|D1|X0|X1|D0+|D1+|Z0|Z1
+												# 	<<=Left Side=|===Right Side=>
+			self._SolvedExpr={}					# A dictionary of logic expression of each internal bit and output bit 
+												# encoded using the format returned by execute in funtions module
+												# aka BitName:['--01','0-11'] <=> BitName=c'd+a'cd
+
+			self.parseNBuildStateBank(fileName)	# Build the StateBank
+			self.buildMainTTb()					# Build the main truth table for all bit
+			print(self._MainTTb)
+			self.buildIntBitTTb()				# Built the truth table for each internal bit
+			self.buildOutBitTTb()				# Built the truth table for each output bit
+			self.solve2buildSolvedExpre()		# Solve the State Diagram to find expression
+			if printSolved:						# Print the solution if asked
+				self.printSolution(self._SolvedExpr)
+
+
+	def solve2buildSolvedExpre(self):
+		"""
+			Solve the state diagram to find 
+			logic expression for each internal bit and output bit
+		"""
+		var2beSolved=(lambda x:x[self.getBLI4P(None):])(self.getFullLabels())
+		for var in var2beSolved:
+			if var[0]==self._IntBitPrefix:
+				# This is an internal bit
+				self._SolvedExpr[var]=self.solve4Logic(TTb=self._IntBitTTb[int(var[1:-1])])
+			else:
+				# This is an output bit
+				self._SolvedExpr[var]=self.solve4Logic(TTb=self._OutBitTTb[int(var[1:])])
+
+	def printSolution(self,Solution):
+		# Print the main truth table
+		print('Main truth table')
+		self.printTTb(TTb=self._MainTTb,Labels=None)
+		print('Truth table of each variable and its expression')
+		varSolved=list(self._SolvedExpr.keys())
+		varSolved.sort()	# Make them printed out in ascending order
+		for var in varSolved:
+			if var[0]==self._IntBitPrefix:
+				# This is an internal bit
+				print('Variable {} :'.format(var))
+				print(self.toExpression(Terms=self._SolvedExpr[var],Labels=self.getBEL(int(var[1:-1]),outputBit=False)))
+				self.printTTb(TTb=self._IntBitTTb[int(var[1:-1])],Labels=self.getBEL(int(var[1:-1]),outputBit=False))
+				print('\n\n')
+			else:
+				# This is an output bit
+				print('Variable {} :'.format(var))
+				print(self.toExpression(Terms=self._SolvedExpr[var],Labels=self.getBEL(int(var[1:]),outputBit=True)))
+				self.printTTb(TTb=self._OutBitTTb[int(var[1:])],Labels=self.getBEL(int(var[1:]),outputBit=True))
+				print('\n\n')
 
 	def parseNBuildStateBank(self,fname):
 		"""Parse the input file to create the _StateBank"""
@@ -123,18 +173,6 @@ class MealyStateDiagram:
 		# So back up
 		f.seek(pos)
 
-	def buildIntBitTTb(self):
-		""" build the truth table for each bit
-			_InBitTTb[bit0,bit1,bit2..]
-			_InBitTTb[bitN]=Dictionary(key(bitstring(Bit0Bit1..BitNInputt0Input1..InputN)=>value(bitN+ = '0' or '1' or' x'))
-		"""
-		self._IntBitTTb=[{} for i in range(self._numIntBit)]	# Make an empty dictionary for each bit
-		leftSide=list(self._MainTTb.keys())						# Get all possible input
-		leftSide.sort()					# Make input ascending order (0..0 ,0..1 ,.0..10,..)
-		for b in range(self._numIntBit):			# Loop through each internal bit and build truth table for such bit
-			for inp in leftSide:
-				self._IntBitTTb[b][inp]=self._MainTTb[inp][b]	#Getting the right side corresponding row of the main truth table and extract the bit out
-
 	def buildMainTTb(self):
 		""" Build the _MainTTb table
 			Format is to have
@@ -145,32 +183,74 @@ class MealyStateDiagram:
 			# Ex, if you have 3 states
 			# you need 4 internal bits but only use up to 10.
 			# The 11 is not used, therefore seen as don't care values
+			
+			# Building the left side of the truth table
 			internalBit=strD2B(state,width=self._numIntBit)	#Bit0Bit1..BitN
 			if state in self._StateBank.keys():	# Is this a defined state?
 				# Yes
-				# Building the left side of the truth table
 				# Getting the Input0Input1...InputN bitstring
-				inpBitList=self._StateBank[state].keys()
+				inpBitList=list(self._StateBank[state].keys())
+				inpBitList.sort()		# Make it looks organized
 				for inp in inpBitList:		#Loop through each
-					leftSideTruthTTb=internalBit+inp
-					self._MainTTb[leftSideTruthTTb]=strD2B(self._StateBank[state][inp][0],width=self._numIntBit)
+					leftSideTruthTTb=internalBit+inp 			# Building the left side
+					# Build the right side which is D0+|D1+|....|Z0|Z1|... (next internal bits states + output bits states)
+					IntBitNextValues=strD2B(self._StateBank[state][inp][0],width=self._numIntBit)	# Next inp next state
+					OutBitNextValues=self._StateBank[state][inp][1]		# Corresponding output bits
+					# Combine next internal bits and output bits to form right side
+					self._MainTTb[leftSideTruthTTb]=IntBitNextValues + OutBitNextValues
 			else:
 				# No this is not a defined state, will be assign don't care
 				inpBitList=[strD2B(x,width=self._numInp) for x in range(2**self._numInp)]
 				for inp in inpBitList:		#Loop through each
+					# Build left side
 					leftSideTruthTTb=internalBit+inp
-					self._MainTTb[leftSideTruthTTb]=self._numIntBit*'x'
+					# Build right side don't care for next bit and output bit 
+					self._MainTTb[leftSideTruthTTb]=(self._numIntBit + self._numOut)*'x'
 
-	def getFullLabels(self,nextState=True):
+	def buildIntBitTTb(self):
+		""" build the truth table for each bit
+			_IntBitTTb[bit0,bit1,bit2..]
+			_IntBitTTb[bitN]=Dictionary(key(bitstring(Bit0Bit1..BitNInputt0Input1..InputN)=>value(bitN+ = '0' or '1' or' x'))
+		"""
+		self._IntBitTTb=[{} for i in range(self._numIntBit)]	# Make an empty dictionary for each bit
+		leftSide=list(self._MainTTb.keys())						# Get all possible input
+		leftSide.sort()					# Make input ascending order (0..0 ,0..1 ,.0..10,..)
+		for b in range(self._numIntBit):			# Loop through each internal bit and build truth table for such bit
+			for inp in leftSide:
+				self._IntBitTTb[b][inp]=self._MainTTb[inp][b]	#Getting the right side corresponding row of the main truth table and extract the bit out
+
+	def buildOutBitTTb(self):
+		""" build the truth table for each bit
+			_OutBitTTb[bit0,bit1,bit2..]
+			_OutBitTTb[bitN]=Dictionary(key(bitstring(Bit0Bit1..BitNInputt0Input1..InputN)=>value(output bitZ = '0' or '1' or' x'))
+		"""
+		self._OutBitTTb=[{} for i in range(self._numOut)]	# Make an empty dictionary for each bit
+		leftSide=list(self._MainTTb.keys())						# Get all possible input
+		leftSide.sort()					# Make input ascending order (0..0 ,0..1 ,.0..10,..)
+		for b in range(self._numOut):			# Loop through each internal bit and build truth table for such bit
+			for inp in leftSide:
+				# Getting the right side corresponding row of the main truth table and extract the bit out
+				# The index of the output bit
+				# in the result value of the _MainTTb dictionary
+				# starts from self._numIntBit 
+				self._OutBitTTb[b][inp]=self._MainTTb[inp][self._numIntBit + b]	
+
+	def getFullLabels(self,nextState=None):
 		"""
 			Make and return the full lables of each column in _MainTTb
-			if nextState=True => right side will be output
+			if nextState = None =>> right side will be internal bits + output bits 
+			nextState= False => right side will be output
 			else => right side will be next internal bit
 		"""
 		leftLables=[self._IntBitPrefix+str(i) for i in range(self._numIntBit)] + [self._InpPrefix+str(i) for i in range(self._numInp)]
-		if nextState:
+		if nextState == None:
+			rightLabels=[self._IntBitPrefix+str(i)+'+' for i in range(self._numIntBit)]	# Internal bits
+			rightLabels+=[self._OutPrefix+str(i) for i in range(self._numOut)] 			# Output bits
+		elif nextState:
+			# nextState= True => only next internal bit
 			rightLabels=[self._IntBitPrefix+str(i)+'+' for i in range(self._numIntBit)]
 		else:
+			# nextState is False or something else => OuputBit
 			rightLabels=[self._OutPrefix+str(i) for i in range(self._numOut)]
 		return leftLables+rightLabels
 
@@ -183,7 +263,7 @@ class MealyStateDiagram:
 			If Labels = None, assuming Labels is the label of _MainTTb
 		"""
 		if Labels==None:
-			Labels=self.getFullLabels(nextState=True)
+			Labels=self.getFullLabels(Labels)
 		numColumn=len(list(TTb.keys())[0])+len(TTb[list(TTb.keys())[0]])
 		maxCoWidth=max([len(x) for x in Labels])
 		cFrame ='{{:>{}}}|'.format(maxCoWidth) 
@@ -245,28 +325,63 @@ class MealyStateDiagram:
 			termList.append(strTerm)
 		return exp + ('+'.join(termList))
 
-"""
-	Implement outputs !!!!!
-"""
+	def getBitLabelIndex(self,bitN=None,outputBit=False):
+		"""
+			Return the next internal bit label 
+			or the output bit label 
+			index in the full labels return by getFullLabels(None)
+			(Aka: one of the label on the right side) which is also column index in _MainTTb
+			Ex: D0|D1|X0|X1|D0+|D1+|Z0|Z1
+			<<===Left Side=|===Right Side=>
+			getBitLabel(bitN=0,outputBit=False) => D0+
+			getBitLabel(bitN=1,outputBit=False) => D1+
+			getBitLabel(bitN=0,outputBit=True) =>  Z0
+			......
+			If outputBit=False => return the label of the next internal bit with index bitN (D0+,D1+...)
+			outputBit=True =>  return the label of the next output bit with index bitN (Z0,Z1...)
+		"""
+		if bitN == None:
+			return self._numIntBit + self._numInp-1
+		if outputBit:
+			# outputBit = True
+			return self._numIntBit + self._numInp + self._numIntBit + bitN
+		else:
+			# outputBit = False
+			return self._numIntBit + self._numInp + bitN
+
+	def getBLI4P(self,bitN=None,outputBit=False):
+		"""
+			getBitLabelIndex4Print
+		"""
+		return self.getBitLabelIndex(bitN,outputBit)+1
+
+	def getBitLabel(self,bitN,outputBit=False):
+		"""
+			Similar to getBitLabelIndex but return the label itself
+		"""
+		labels=self.getFullLabels(None)
+		if outputBit:
+			# outputBit = True
+			return labels[self._numIntBit + self._numInp + self._numIntBit + bitN]
+		else:
+			# outputBit = False
+			return labels[self._numIntBit + self._numInp + bitN]
+
+	def getBEL(self,bitN=None,outputBit=False):
+		"""
+			getBitEpxressionLabel
+		"""
+		labels=self.getFullLabels()
+		return labels[:self.getBLI4P(None)] + [self.getBitLabel(bitN,outputBit)]
+
 #=====================================MainProgram=============================================
 a=MealyStateDiagram('./test2.txt')
-# X='11001'
+
 # labels=a.getFullLabels()
 # a.printTTb(TTb=a._MainTTb,Labels=None)
-# a.printTTb(TTb=a._IntBitTTb[0],Labels=labels[:-1])
-# a.printTTb(TTb=a._IntBitTTb[1],Labels=(labels[:-2]+[labels[-1]]))
+# a.printTTb(TTb=a._IntBitTTb[0],Labels=a.getBEL(0,outputBit=False))
+# a.printTTb(TTb=a._OutBitTTb[0],Labels=a.getBEL(0,outputBit=True))
 # term0=a.solve4Logic(TTb=a._IntBitTTb[0])
-# term1=a.solve4Logic(TTb=a._IntBitTTb[1])
-# print(a.toExpression(Terms=term0,Labels=labels[:-1]))
-# print(a.toExpression(Terms=term1,Labels=(labels[:-2]+[labels[-1]])))
-labels=a.getFullLabels()
-a.printTTb(TTb=a._MainTTb,Labels=None)
-a.printTTb(TTb=a._IntBitTTb[0],Labels=labels[:-2])
-a.printTTb(TTb=a._IntBitTTb[1],Labels=(labels[:-3]+[labels[-2]]))
-a.printTTb(TTb=a._IntBitTTb[2],Labels=(labels[:-3]+[labels[-1]]))
-term0=a.solve4Logic(TTb=a._IntBitTTb[0])
-term1=a.solve4Logic(TTb=a._IntBitTTb[1])
-term2=a.solve4Logic(TTb=a._IntBitTTb[2])
-print(a.toExpression(Terms=term0,Labels=labels[:-2]))
-print(a.toExpression(Terms=term1,Labels=(labels[:-3]+[labels[-2]])))
-print(a.toExpression(Terms=term2,Labels=(labels[:-3]+[labels[-1]])))
+# term1=a.solve4Logic(TTb=a._OutBitTTb[0])
+# print(a.toExpression(Terms=term0,Labels=a.getBEL(0,outputBit=False)))
+# print(a.toExpression(Terms=term1,Labels=a.getBEL(0,outputBit=True)))

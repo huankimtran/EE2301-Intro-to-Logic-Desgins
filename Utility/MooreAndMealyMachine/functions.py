@@ -204,8 +204,8 @@ def execute(function, size):
                     break
             piChart[i][j] = 1 if match else 0
 
-    print("Prime implicant chart:")
-    printPIchart(size, minTerms, primeImplicants, piChart)
+    # print("Prime implicant chart:")
+    # printPIchart(size, minTerms, primeImplicants, piChart)
 
     EPIs = []
 
@@ -244,8 +244,8 @@ def execute(function, size):
 
     primeImplicants = [x for x in primeImplicants if x not in EPIs]
 
-    print("Reduced prime implicant chart:")
-    printPIchart(size, minTerms, primeImplicants, piChart)
+    # print("Reduced prime implicant chart:")
+    # printPIchart(size, minTerms, primeImplicants, piChart)
 
     # to determine the expression with the least terms, we will map each implicant to its number of variables
     # and determine the least cost circuit once the function is condensed with Petrick's method
@@ -280,7 +280,7 @@ def execute(function, size):
 
     # determining least cost circuit using implicant mappings and a condensed product of sums
     leastCost = getLeastCost(condensedPOS, PIterms)
-    print(expressionTerms)
+    # print(expressionTerms)
     expressionTerms.extend([primeImplicants[x] for x in leastCost])
 
     # print(expressionTerms)
