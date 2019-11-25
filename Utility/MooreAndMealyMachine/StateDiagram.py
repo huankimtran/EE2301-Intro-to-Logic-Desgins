@@ -245,15 +245,28 @@ class MealyStateDiagram:
 			termList.append(strTerm)
 		return exp + ('+'.join(termList))
 
-
+"""
+	Implement outputs !!!!!
+"""
 #=====================================MainProgram=============================================
-a=MealyStateDiagram('./test.txt')
+a=MealyStateDiagram('./test2.txt')
 # X='11001'
+# labels=a.getFullLabels()
+# a.printTTb(TTb=a._MainTTb,Labels=None)
+# a.printTTb(TTb=a._IntBitTTb[0],Labels=labels[:-1])
+# a.printTTb(TTb=a._IntBitTTb[1],Labels=(labels[:-2]+[labels[-1]]))
+# term0=a.solve4Logic(TTb=a._IntBitTTb[0])
+# term1=a.solve4Logic(TTb=a._IntBitTTb[1])
+# print(a.toExpression(Terms=term0,Labels=labels[:-1]))
+# print(a.toExpression(Terms=term1,Labels=(labels[:-2]+[labels[-1]])))
 labels=a.getFullLabels()
 a.printTTb(TTb=a._MainTTb,Labels=None)
-a.printTTb(TTb=a._IntBitTTb[0],Labels=labels[:-1])
-a.printTTb(TTb=a._IntBitTTb[1],Labels=(labels[:-2]+[labels[-1]]))
+a.printTTb(TTb=a._IntBitTTb[0],Labels=labels[:-2])
+a.printTTb(TTb=a._IntBitTTb[1],Labels=(labels[:-3]+[labels[-2]]))
+a.printTTb(TTb=a._IntBitTTb[2],Labels=(labels[:-3]+[labels[-1]]))
 term0=a.solve4Logic(TTb=a._IntBitTTb[0])
 term1=a.solve4Logic(TTb=a._IntBitTTb[1])
-print(a.toExpression(Terms=term0,Labels=labels[:-1]))
-print(a.toExpression(Terms=term1,Labels=(labels[:-2]+[labels[-1]])))
+term2=a.solve4Logic(TTb=a._IntBitTTb[2])
+print(a.toExpression(Terms=term0,Labels=labels[:-2]))
+print(a.toExpression(Terms=term1,Labels=(labels[:-3]+[labels[-2]])))
+print(a.toExpression(Terms=term2,Labels=(labels[:-3]+[labels[-1]])))
