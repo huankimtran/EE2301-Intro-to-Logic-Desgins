@@ -1,4 +1,5 @@
 import math
+from functions import *
 """
 State diagram representation
 
@@ -48,11 +49,14 @@ class MealyStateDiagram:
 			key =========================================>> value
 			decimal(StateIndex)					dictionary(key(inputputBitString)=>Value(tuple(NextstateIndex,Output))
 		_IntBitTTb is a list of dictionary
-			_IntBitTTB[bitN]= Dictionary representing truth table of the bit
+			_IntBitTTb[bitN]= Dictionary representing truth table of the bit
 				Dictionary(key(bitstring(Bit0Bit1..BitNInputt0Input1..InputN)=>value(bitN+='0' or '1' or 'x'(don't care)))
 
 	"""
 	def __init__(self,fileName):
+			self._OutPrefix='Z'					# The prefix of output bits (Z0,Z1,..)
+			self._InpPrefix='X'					# The prefix of input bits (X0,X1,..)
+			self._IntBitPrefix='D'				# The prefix of internal bits (D0,D1,D2...) 
 			self._mType="NotSet"
 			self._numState=0					# Number of State
 			self._numInp=0						# Number of inputs
@@ -134,7 +138,7 @@ class MealyStateDiagram:
 	def buildMainTTb(self):
 		""" Build the _MainTTb table
 			Format is to have
-			_MainTTB[key(bitstring(Bit0Bit1..BitNInputt0Input1..InputN)=>value(bitN+ = '0' or '1' or 'x')]
+			_MainTTb[key(bitstring(Bit0Bit1..BitNInputt0Input1..InputN)=>value(bitN+ = '0' or '1' or 'x')]
 		"""
 		for state in range(2**self._numIntBit):	# Loop though each binarystring representing states
 			# There are potentially bitstrings that are not used.
@@ -152,11 +156,104 @@ class MealyStateDiagram:
 					self._MainTTb[leftSideTruthTTb]=strD2B(self._StateBank[state][inp][0],width=self._numIntBit)
 			else:
 				# No this is not a defined state, will be assign don't care
-				inpBitList=[strD2B(x,width=self._numInp) for x in range(self._numInp)]			
+				inpBitList=[strD2B(x,width=self._numInp) for x in range(2**self._numInp)]
 				for inp in inpBitList:		#Loop through each
 					leftSideTruthTTb=internalBit+inp
 					self._MainTTb[leftSideTruthTTb]=self._numIntBit*'x'
+
+	def getFullLabels(self,nextState=True):
+		"""
+			Make and return the full lables of each column in _MainTTb
+			if nextState=True => right side will be output
+			else => right side will be next internal bit
+		"""
+		leftLables=[self._IntBitPrefix+str(i) for i in range(self._numIntBit)] + [self._InpPrefix+str(i) for i in range(self._numInp)]
+		if nextState:
+			rightLabels=[self._IntBitPrefix+str(i)+'+' for i in range(self._numIntBit)]
+		else:
+			rightLabels=[self._OutPrefix+str(i) for i in range(self._numOut)]
+		return leftLables+rightLabels
+
+	def printTTb(self,TTb,Labels=None):
+		""" 
+			Function printing truth table
+			TTb is a dictionary with structure like _MainTTb or _IntBitTTb
+			Labels is a list containing label for each column in TTb.
+			Column in TTb will be assigned to corresponding label in Labels that has the same index
+			If Labels = None, assuming Labels is the label of _MainTTb
+		"""
+		if Labels==None:
+			Labels=self.getFullLabels(nextState=True)
+		numColumn=len(list(TTb.keys())[0])+len(TTb[list(TTb.keys())[0]])
+		maxCoWidth=max([len(x) for x in Labels])
+		cFrame ='{{:>{}}}|'.format(maxCoWidth) 
+		tableFrame='|'+len(Labels)*cFrame
+		print(numColumn*(maxCoWidth+1)*'=')
+		print(tableFrame.format(*Labels))				# Using parameter expansion
+		print(numColumn*(maxCoWidth+1)*'=')
+		for r in TTb.keys():
+			print(tableFrame.format(*(r+TTb[r])))
+			print(numColumn*(maxCoWidth+1)*'=')
+
+	def solve4Logic(self,TTb):
+		"""
+			Using the provided library that implement Quine-McCluskey Method
+			to solve for logic expression
+			TTb is a truth table with left side is all input and right side is
+			ONLY ONE variable of which expression will be solved for (aka: something similar to 
+			an element of the _IntBitTTb)
+			return a list[]=['01-1...','01-1...',...]
+		"""
+		size=self._numIntBit+self._numInp
+		# Parsing minterm from truth table
+		minTerm='m({})\n'
+		dcTerm='d({})'
+		minList=list(map(lambda x:str(int(x,2)),list(filter(lambda x:TTb[x]=='1',list(TTb.keys())))))
+		dcList=list(map(lambda x:str(int(x,2)),filter(lambda x:TTb[x]=='x',list(TTb.keys()))))
+		function=[size]
+		# Is there any min term? this is silly since there are always at least 1 min term but added anw
+		if len(minList)>0:
+			function.append(minTerm.format(','.join(minList)))
+		else:
+			function.append('m()')
+		# Is there any don't care value?
+		if len(dcList)>0:
+			# Yes, so add them
+			function.append(dcTerm.format(','.join(dcList)))
+		print()
+		expressionTerms = execute(function, size)
+#		printExpression(size, expressionTerms)
+		return expressionTerms
+
+	def toExpression(self,Terms,Labels):
+		"""
+			Decode the Terms list returned by solve4Logic to a logic expression
+			Terms : returned by solve4Logic()
+			Labels: list of labels of the truth table's column of this variable
+					this variable is similar to the one supplying to printTTb
+					the variable name with + will be at the right most position
+		"""
+		exp='{} = '.format(Labels[-1])	# the front part of the expression
+		termList=[]
+		for t in Terms:					# Iterate through each term and decode
+			strTerm=''
+			for v in range(len(t)):
+				if t[v] == '0':
+					strTerm=strTerm+(Labels[v]+"'")
+				elif t[v] == '1':
+					strTerm=strTerm+(Labels[v])
+			termList.append(strTerm)
+		return exp + ('+'.join(termList))
+
+
 #=====================================MainProgram=============================================
 a=MealyStateDiagram('./test.txt')
-X='11001'
-nowState=0
+# X='11001'
+labels=a.getFullLabels()
+a.printTTb(TTb=a._MainTTb,Labels=None)
+a.printTTb(TTb=a._IntBitTTb[0],Labels=labels[:-1])
+a.printTTb(TTb=a._IntBitTTb[1],Labels=(labels[:-2]+[labels[-1]]))
+term0=a.solve4Logic(TTb=a._IntBitTTb[0])
+term1=a.solve4Logic(TTb=a._IntBitTTb[1])
+print(a.toExpression(Terms=term0,Labels=labels[:-1]))
+print(a.toExpression(Terms=term1,Labels=(labels[:-2]+[labels[-1]])))
