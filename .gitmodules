@@ -1,0 +1,3 @@
+[submodule "Utility/MooreAndMealyMachine/Utility/MooreAndMealyMachine/boolean-function-simplifier"]
+	path = Utility/MooreAndMealyMachine/Utility/MooreAndMealyMachine/boolean-function-simplifier
+	url = https://github.com/dantemazza/boolean-function-simplifier.git
