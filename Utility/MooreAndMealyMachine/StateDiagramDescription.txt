@@ -14,16 +14,17 @@ State index
 OutputOfThisState
 ======For Mealy==============
 State index
-(Next State index(decimal)) PairInput1Input2,Output1Output1(binary)  PairInput1Input2,Output1Output1(binary) 
-(Next State index(decimal)) PairInput1Input2,Output1Output1(binary)  PairInput1Input2,Output1Output1(binary) 
+(Next State index(decimal)) PairInput0Input1,Output0Output1(binary)  PairInput0Input2,Output0Output1(binary) 
+(Next State index(decimal)) PairInput0Input1,Output0Output1(binary)  PairInput0Input2,Output0Output1(binary) 
 State index
-(Next State index(decimal)) PairInput1Input2,Output1Output1(binary)  PairInput1Input2,Output1Output1(binary) 
-(Next State index(decimal)) PairInput1Input2,Output1Output1(binary)  PairInput1Input2,Output1Output1(binary) 
+(Next State index(decimal)) PairInput0Input1,Output0Output1(binary)  PairInput0Input2,Output0Output1(binary) 
+(Next State index(decimal)) PairInput0Input1,Output0Output1(binary)  PairInput0Input2,Output0Output1(binary) 
 ==============================
 Test input sequence
-Simulate Output1
-Simulate Output2
-
-Outut
-Combinational Logic
-Kmap
+Input 0
+Input 1
+...
+Input N
+Sample Output0
+Sample Output1
+...

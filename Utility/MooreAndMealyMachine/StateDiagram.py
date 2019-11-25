@@ -77,16 +77,57 @@ class MealyStateDiagram:
 			self._SolvedExpr={}					# A dictionary of logic expression of each internal bit and output bit 
 												# encoded using the format returned by execute in funtions module
 												# aka BitName:['--01','0-11'] <=> BitName=c'd+a'cd
-
-			self.parseNBuildStateBank(fileName)	# Build the StateBank
+			self._TestInp=[]						# Test input
+			self._TestOut=[]						# Test output
+			self.parseNBuildStateBank(fileName)	# Build the StateBank, _TestInp and _TestOut needs to be initilized above this
+			if len(self._TestInp)>0:			# Is there test to test the diagram?
+				# Test it
+				if self.verifyDiagram():
+					print('State Diagram is Correct!')
+				else:
+					print('WRONG state Diagram')
+					return
+			# Only countinue to solve if the diagram is correct
+			# Program won't reach here if it failed the test case
 			self.buildMainTTb()					# Build the main truth table for all bit
-			print(self._MainTTb)
 			self.buildIntBitTTb()				# Built the truth table for each internal bit
 			self.buildOutBitTTb()				# Built the truth table for each output bit
 			self.solve2buildSolvedExpre()		# Solve the State Diagram to find expression
 			if printSolved:						# Print the solution if asked
 				self.printSolution(self._SolvedExpr)
 
+
+	def verifyDiagram(self):
+		inpSequene=[]
+		# Build input sequence
+		for time in range(len(self._TestInp[0])):
+			inpSequene.append('')
+			for inp in range(len(self._TestInp)):
+				inpSequene[time]+=self._TestInp[inp][time]
+		outSequence=self._numOut*['']
+		# Always starts at state 0
+		cState=0
+		for t in range(len(inpSequene)-1):							# Ignore the last output bit
+			nextOutput=self._StateBank[cState][inpSequene[t]][1]	# Obtaining the next input
+			cState=self._StateBank[cState][inpSequene[t]][0]		# Obtain the next state
+			# Accumulate the outputs to the  corrent output string
+			for i in range(len(nextOutput)):
+				outSequence[i]+=nextOutput[i]
+		# Match the generated sequence with given one and check if any difference
+		print('Output sequence using given state diagram :')
+		print(outSequence)
+		print('Corrent output sequence :')
+		print()
+		print(self._TestOut)
+		if len(list(filter(lambda x:not x,list(map(lambda a,b:a==b,outSequence,self._TestOut))
+)))==0:
+			return True
+		else:
+			return False
+
+		# Ignore the first value of the outputt test
+		# since you can not be sure about the first state output
+		
 
 	def solve2buildSolvedExpre(self):
 		"""
@@ -147,6 +188,10 @@ class MealyStateDiagram:
 				stateIndex=int(line)
 				self._StateBank[stateIndex]={}
 				i=i+1
+				# Reach the test input and output sequence part yet?
+				if(i > self._numState):
+					# Yes, then get out of the loop to parse the test input output
+					break
 				if totalLink!=0:
 					if totalLink < 2**self._numInp:
 						print('Need more link: State {} has {} links, but need {}'.format(stateIndex-1,totalLink,2**self._numInp))
@@ -172,6 +217,18 @@ class MealyStateDiagram:
 		# When the loop exit, the file cursor is at the test input
 		# So back up
 		f.seek(pos)
+		if len(parsedLine)!=0:		# Is there any tests ?
+			# Yes, so initialize the containers and get them
+			self._TestInp=self._numInp*['']		# Test input
+			self._TestOut=self._numOut*['']		# Test output
+			# Get input test
+			for ti in range(self._numInp):
+				line=f.readline()
+				self._TestInp[ti]=line[:-1]	# line[:-1] to get rid of the \n
+			# Get output test
+			for to in range(self._numInp):
+				line=f.readline()
+				self._TestOut[to]=line[:-1]	# line[:-1] to get rid of the \n
 
 	def buildMainTTb(self):
 		""" Build the _MainTTb table
@@ -375,7 +432,8 @@ class MealyStateDiagram:
 		return labels[:self.getBLI4P(None)] + [self.getBitLabel(bitN,outputBit)]
 
 #=====================================MainProgram=============================================
-a=MealyStateDiagram('./test2.txt')
+# This is only to test this module, use main.py to run the correct diagram
+#a=MealyStateDiagram('./test2.txt')
 
 # labels=a.getFullLabels()
 # a.printTTb(TTb=a._MainTTb,Labels=None)
