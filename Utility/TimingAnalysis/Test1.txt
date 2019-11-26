@@ -1,0 +1,5 @@
+var_name{a=0,b=1,c=1}
+func_name{f,f1,f2}
+1,f=OR(a,AND(a,b),b)
+2,f1=XOR(a,AND(a,b),XOR(a,b,c),c)
+3,f2=XOR(a,AND(f,f1),XOR(a,b,c),NOT(c))

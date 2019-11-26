@@ -1,0 +1,11 @@
+#===================Define=Variables====================
+# Variable name INCLUDING function name separate by comas , form = letters (and or number) no space, Function name set to u
+
+var_name{var0_name=initial_value,var1_name=initial_value,...}	
+
+func_name{func0_name,func_1_name}	
+#===================Define=Functions====================
+#Function name same requirement as variable names
+delay,func0_name=And(XOR(var0_name,var1_name,..),OR(var1_name,var2_name))	#define the function
+delay,func1_name=....
+
