@@ -185,13 +185,13 @@ class MealyStateDiagram:
 				break
 			elif len(parsedLine) == 1:			# Is this a state line or a state's connection line?
 				#This is state line
-				stateIndex=int(line)
-				self._StateBank[stateIndex]={}
 				i=i+1
 				# Reach the test input and output sequence part yet?
 				if(i > self._numState):
 					# Yes, then get out of the loop to parse the test input output
 					break
+				stateIndex=int(line)
+				self._StateBank[stateIndex]={}
 				if totalLink!=0:
 					if totalLink < 2**self._numInp:
 						print('Need more link: State {} has {} links, but need {}'.format(stateIndex-1,totalLink,2**self._numInp))
@@ -357,6 +357,9 @@ class MealyStateDiagram:
 		if len(dcList)>0:
 			# Yes, so add them
 			function.append(dcTerm.format(','.join(dcList)))
+		else:
+			# No, you need to take of the '\n' in function[1]
+			function[1]=function[1][:-1]
 		print()
 		expressionTerms = execute(function, size)
 #		printExpression(size, expressionTerms)

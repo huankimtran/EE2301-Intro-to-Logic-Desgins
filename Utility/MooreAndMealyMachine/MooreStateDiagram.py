@@ -3,7 +3,6 @@ from functions import *
 """
 State diagram representation
 
-Mealy with JKFF
 """
 """ Convert a decimal number in a string to a binary number in string
 	num		: the number
@@ -42,7 +41,7 @@ class Mchine():
 	def __init__(self):
 		self.mType=mType
 """
-class MealyStateDiagram:				
+class MooreStateDiagram:				
 	"""
 		Input value take 
 		_mType is "Mo" or "Me"
@@ -69,6 +68,7 @@ class MealyStateDiagram:
 			self._numOut=0						# Number of outputs
 			self._numIntBit=0					# Number of internal bit to represent state
 			self._StateBank={}					# The collection of state object
+			self._StateOutputBank={}				# A dictionary of the output of each state (key(stateIndex)=>value(output of the state))
 			self._IntBitTTb=[]					# The collection of internal bit next state truth table
 			self._OutBitTTb=[]					# The collection of otuput bit truth table
 			self._MainTTb={}					# The main truth table where left side are current state
@@ -108,12 +108,12 @@ class MealyStateDiagram:
 		outSequence=self._numOut*['']
 		# Always starts at state 0
 		cState=0
-		for t in range(len(inpSequene)-1):							# Ignore the last output bit
-			nextOutput=self._StateBank[cState][inpSequene[t]][1]	# Obtaining the next input
-			cState=self._StateBank[cState][inpSequene[t]][0]		# Obtain the next state
+		for t in range(len(inpSequene)):							# Ignore the last output bit
+			cOutput=self._StateOutputBank[cState]					# Obtaining the current output
+			cState=self._StateBank[cState][inpSequene[t]]			# Obtain the next state
 			# Accumulate the outputs to the  corrent output string
-			for i in range(len(nextOutput)):
-				outSequence[i]+=nextOutput[i]
+			for i in range(len(cOutput)):
+				outSequence[i]+=cOutput[i]		 
 		# Match the generated sequence with given one and check if any difference
 		print('Output sequence using given state diagram :')
 		print(outSequence)
@@ -142,7 +142,7 @@ class MealyStateDiagram:
 				self._SolvedExpr[var]=self.solve4Logic(TTb=self._IntBitTTb[int(var[1:-1])])
 			else:
 				# This is an output bit
-				self._SolvedExpr[var]=self.solve4Logic(TTb=self._OutBitTTb[int(var[1:])])
+				self._SolvedExpr[var]=self.solve4Logic(TTb=self._OutBitTTb[int(var[1:])],outputSolve=True)
 
 	def printSolution(self,Solution):
 		# Print the main truth table
@@ -186,13 +186,15 @@ class MealyStateDiagram:
 				break
 			elif len(parsedLine) == 1:			# Is this a state line or a state's connection line?
 				#This is state line
-				stateIndex=int(line)
-				self._StateBank[stateIndex]={}
 				i=i+1
 				# Reach the test input and output sequence part yet?
 				if(i > self._numState):
 					# Yes, then get out of the loop to parse the test input output
 					break
+				parsedState=line.split(',')		# Moore have statei index, output				
+				stateIndex=int(parsedState[0])
+				self._StateBank[stateIndex]={}
+				self._StateOutputBank[stateIndex]=parsedState[1]	# Each state has at least a key named "OUT" to save output value of the state
 				if totalLink!=0:
 					if totalLink < 2**self._numInp:
 						print('Need more link: State {} has {} links, but need {}'.format(stateIndex-1,totalLink,2**self._numInp))
@@ -207,13 +209,13 @@ class MealyStateDiagram:
 				nextStateIndex=int(parsedLine[0])
 				del parsedLine[0]
 				for j in parsedLine:
-					InpCommaOut=j.split(',')
-					if InpCommaOut[0] in self._StateBank[stateIndex].keys():	# Is this input sequence already added?
+					if j in self._StateBank[stateIndex].keys():	# Is this input sequence already added?
 						# Already added, so spit out error
 						print('Duplicated input sequence: State {}, next state {}, {} input sequence duplicated'.format(stateIndex,nextStateIndex,InpCommaOut[0]))
 						raise ValueError('Error building main truth table')
 					else:
-						self._StateBank[stateIndex][InpCommaOut[0]]=(nextStateIndex,InpCommaOut[1])
+						self._StateBank[stateIndex][j]=nextStateIndex	# Moore does not need next state output since each state has one output
+																			# -1 indicate no use
 					totalLink+=1
 		# When the loop exit, the file cursor is at the test input
 		# So back up
@@ -230,6 +232,8 @@ class MealyStateDiagram:
 			for to in range(self._numInp):
 				line=f.readline()
 				self._TestOut[to]=line[:-1]	# line[:-1] to get rid of the \n
+		print("State Bank",self._StateBank)
+		print("Output Bank",self._StateOutputBank)
 
 	def buildMainTTb(self):
 		""" Build the _MainTTb table
@@ -252,8 +256,8 @@ class MealyStateDiagram:
 				for inp in inpBitList:		#Loop through each
 					leftSideTruthTTb=internalBit+inp 			# Building the left side
 					# Build the right side which is D0+|D1+|....|Z0|Z1|... (next internal bits states + output bits states)
-					IntBitNextValues=strD2B(self._StateBank[state][inp][0],width=self._numIntBit)	# Next inp next state
-					OutBitNextValues=self._StateBank[state][inp][1]		# Corresponding output bits
+					IntBitNextValues=strD2B(self._StateBank[state][inp],width=self._numIntBit)	# Next inp next state
+					OutBitNextValues=self._StateOutputBank[state]				# Corresponding output bits
 					# Combine next internal bits and output bits to form right side
 					self._MainTTb[leftSideTruthTTb]=IntBitNextValues + OutBitNextValues
 			else:
@@ -291,7 +295,10 @@ class MealyStateDiagram:
 				# The index of the output bit
 				# in the result value of the _MainTTb dictionary
 				# starts from self._numIntBit 
-				self._OutBitTTb[b][inp]=self._MainTTb[inp][self._numIntBit + b]	
+				# Moore machine output does not depends on input value so
+				# the input bits in inp needs to be removed
+				outpCo=inp[:len(inp)-self._numInp]
+				self._OutBitTTb[b][outpCo]=self._MainTTb[inp][self._numIntBit + b]	
 
 	def getFullLabels(self,nextState=None):
 		"""
@@ -333,7 +340,7 @@ class MealyStateDiagram:
 			print(tableFrame.format(*(r+TTb[r])))
 			print(numColumn*(maxCoWidth+1)*'=')
 
-	def solve4Logic(self,TTb):
+	def solve4Logic(self,TTb,outputSolve=False):
 		"""
 			Using the provided library that implement Quine-McCluskey Method
 			to solve for logic expression
@@ -342,7 +349,10 @@ class MealyStateDiagram:
 			an element of the _IntBitTTb)
 			return a list[]=['01-1...','01-1...',...]
 		"""
-		size=self._numIntBit+self._numInp
+		if outputSolve:
+			size=self._numIntBit
+		else:
+			size=self._numIntBit+self._numInp
 		# Parsing minterm from truth table
 		minTerm='m({})\n'
 		dcTerm='d({})'
@@ -358,7 +368,10 @@ class MealyStateDiagram:
 		if len(dcList)>0:
 			# Yes, so add them
 			function.append(dcTerm.format(','.join(dcList)))
-		print()
+		else:
+			# No, you need to take of the '\n' in function[1]
+			function[1]=function[1][:-1]
+		print(function)
 		expressionTerms = execute(function, size)
 #		printExpression(size, expressionTerms)
 		return expressionTerms
@@ -430,11 +443,15 @@ class MealyStateDiagram:
 			getBitEpxressionLabel
 		"""
 		labels=self.getFullLabels()
-		return labels[:self.getBLI4P(None)] + [self.getBitLabel(bitN,outputBit)]
+		if outputBit:
+			# Moore state output truth table does not have inputs
+			return labels[:self.getBLI4P(None)-self._numInp] + [self.getBitLabel(bitN,outputBit)]
+		else:
+			return labels[:self.getBLI4P(None)] + [self.getBitLabel(bitN,outputBit)]
 
 #=====================================MainProgram=============================================
 # This is only to test this module, use main.py to run the correct diagram
-#a=MealyStateDiagram('./test2.txt')
+a=MooreStateDiagram('./MoTest3.txt')
 
 # labels=a.getFullLabels()
 # a.printTTb(TTb=a._MainTTb,Labels=None)
