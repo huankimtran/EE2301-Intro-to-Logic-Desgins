@@ -115,7 +115,9 @@ class CircuitTimer:
 
     def printAllDelayTable(self):
         for i in self._DelayTable.keys():
+            print('-------------------------------------')
             self.printDelayTable(i)
+            print('-------------------------------------')
 
     def printDelayTable(self,inp):
         listVar=list(filter(lambda x:isinstance(self._NameBank[x],list),self._NameBank.keys())) # Get list function
