@@ -81,7 +81,9 @@ def simplify(SOP):
                     SOPsets[i] = None
                 elif SOPsets[i].issubset(SOPsets[j]):
                     SOPsets[j] = None
+    print('f',SOPsets)
     res = [list(x) for x in SOPsets if x is not None]
+    print('f',res)
     return res
 
 def getLeastCost(POS, PIterms):
@@ -230,17 +232,24 @@ def execute(function, size):
     # print(EPIs)
 
     expressionTerms.extend(EPIs)
+    print('m',minTerms)
+    print('PI',primeImplicants)
+    print('EPI',EPIs)
+    print('p',piChart)
     # removing the essential prime implicants and corresponding columns from the PIchart in preperation for Petrick's Method
     for i in range(len(primeImplicants) - 1, -1, -1):
         if not primeImplicants[i] in EPIs:
             continue
         for j in range(len(minTerms) - 1, -1, -1):
+            print('ij ',i,j)
             if piChart[i][j] == 1:
+                print('here',i,j)
                 minTerms.pop(j)
                 for k in piChart:
                     del k[j]
-
         piChart.pop(i)
+        print('p',piChart)
+        print('mt',minTerms)
 
     primeImplicants = [x for x in primeImplicants if x not in EPIs]
 
@@ -274,10 +283,10 @@ def execute(function, size):
         POS.append(currSum)
 
     # print(POS)
-
+    print('f',POS)  
     condensedPOS = simplify(distributePOS(POS)) if len(POS) > 1 else POS
     # print(condensedPOS)
-
+    print('e',condensedPOS)
     # determining least cost circuit using implicant mappings and a condensed product of sums
     leastCost = getLeastCost(condensedPOS, PIterms)
     # print(expressionTerms)

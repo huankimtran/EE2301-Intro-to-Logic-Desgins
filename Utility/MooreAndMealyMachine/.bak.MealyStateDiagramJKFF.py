@@ -3,6 +3,7 @@ from functions import *
 """
 State diagram representation
 
+Mealy with JKFF
 """
 """ Convert a decimal number in a string to a binary number in string
 	num		: the number
@@ -70,7 +71,7 @@ class MealyStateDiagram:
 			self._StateBank={}					# The collection of state object
 			self._IntBitTTb=[]					# The collection of internal bit next state truth table
 			self._OutBitTTb=[]					# The collection of otuput bit truth table
-			self._JKBitTTb=[]
+			self._JKBitTTb=[]					# Truth table for JK inputs
 			self._MainTTb={}					# The main truth table where left side are current state
 												# and right side are next state of each bit and the ouput bits
 												# Ex: D0|D1|X0|X1|D0+|D1+|Z0|Z1
@@ -93,36 +94,10 @@ class MealyStateDiagram:
 			self.buildMainTTb()					# Build the main truth table for all bit
 			self.buildIntBitTTb()				# Built the truth table for each internal bit
 			self.buildOutBitTTb()				# Built the truth table for each output bit
-			self.buildJKBitTTb()
 			self.solve2buildSolvedExpre()		# Solve the State Diagram to find expression
-			self.solveJKFF()					
 			if printSolved:						# Print the solution if asked
 				self.printSolution(self._SolvedExpr)
 
-	def solveJKFF(self):
-		for i in range(self._numIntBit):
-			self._SolvedExpr['J'+str(i)+'+']=self.solve4Logic(TTb=self._JKBitTTb[i]['J'])
-			self._SolvedExpr['K'+str(i)+'+']=self.solve4Logic(TTb=self._JKBitTTb[i]['K'])
-
-	def nextJK(self,cI,nI):
-		if cI=='0' and nI=='0':
-			return {'J':'0','K':'x'}
-		elif cI=='0' and nI=='1':
-			return {'J':'1','K':'x'}
-		elif cI=='1' and nI=='0':
-			return {'J':'x','K':'1'}
-		elif cI=='1' and nI=='1':
-			return {'J':'x','K':'0'}
-		else:
-			return {'J':'x','K':'x'}
-
-	def buildJKBitTTb(self):
-		for i in range(self._numIntBit):
-			self._JKBitTTb.append({'J':{},'K':{}})
-			for inp in self._IntBitTTb[i].keys():
-				vl=self.nextJK(inp[i],self._IntBitTTb[i][inp])
-				self._JKBitTTb[i]['J'][inp]=vl['J']
-				self._JKBitTTb[i]['K'][inp]=vl['K']
 
 	def verifyDiagram(self):
 		inpSequene=[]
@@ -212,13 +187,13 @@ class MealyStateDiagram:
 				break
 			elif len(parsedLine) == 1:			# Is this a state line or a state's connection line?
 				#This is state line
+				stateIndex=int(line)
+				self._StateBank[stateIndex]={}
 				i=i+1
 				# Reach the test input and output sequence part yet?
 				if(i > self._numState):
 					# Yes, then get out of the loop to parse the test input output
 					break
-				stateIndex=int(line)
-				self._StateBank[stateIndex]={}
 				if totalLink!=0:
 					if totalLink < 2**self._numInp:
 						print('Need more link: State {} has {} links, but need {}'.format(stateIndex-1,totalLink,2**self._numInp))
@@ -359,7 +334,7 @@ class MealyStateDiagram:
 			print(tableFrame.format(*(r+TTb[r])))
 			print(numColumn*(maxCoWidth+1)*'=')
 
-	def solve4Logic(self,TTb,size=None):
+	def solve4Logic(self,TTb):
 		"""
 			Using the provided library that implement Quine-McCluskey Method
 			to solve for logic expression
@@ -368,8 +343,7 @@ class MealyStateDiagram:
 			an element of the _IntBitTTb)
 			return a list[]=['01-1...','01-1...',...]
 		"""
-		if size==None:
-			size=self._numIntBit+self._numInp
+		size=self._numIntBit+self._numInp
 		# Parsing minterm from truth table
 		minTerm='m({})\n'
 		dcTerm='d({})'
@@ -385,10 +359,7 @@ class MealyStateDiagram:
 		if len(dcList)>0:
 			# Yes, so add them
 			function.append(dcTerm.format(','.join(dcList)))
-		else:
-			# No, you need to take of the '\n' in function[1]
-			function[1]=function[1][:-1]
-		print(function)
+		print()
 		expressionTerms = execute(function, size)
 #		printExpression(size, expressionTerms)
 		return expressionTerms
@@ -464,7 +435,7 @@ class MealyStateDiagram:
 
 #=====================================MainProgram=============================================
 # This is only to test this module, use main.py to run the correct diagram
-a=MealyStateDiagram('./test2.txt')
+#a=MealyStateDiagram('./test2.txt')
 
 # labels=a.getFullLabels()
 # a.printTTb(TTb=a._MainTTb,Labels=None)
