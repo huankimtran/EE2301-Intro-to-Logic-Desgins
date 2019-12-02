@@ -1,0 +1,11 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  \
+"../../../../Lab3_Implement4WayStoplightControllerOnHardware.srcs/sources_1/new/DFF.v" \
+"../../../../Lab3_Implement4WayStoplightControllerOnHardware.srcs/sim_1/new/DFF_SIM.v" \
+"../../../../Lab3_Implement4WayStoplightControllerOnHardware.srcs/sim_1/new/BinaryCounter_4_SIM.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort

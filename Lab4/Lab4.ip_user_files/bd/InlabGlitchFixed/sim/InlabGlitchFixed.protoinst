@@ -1,0 +1,9 @@
+{
+	"version": "1.0",
+	"modules": {
+		"InlabGlitchFixed": {
+			"proto_instances": {
+			}
+		}
+	}
+}
