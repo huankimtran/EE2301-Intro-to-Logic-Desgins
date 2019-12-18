@@ -4,10 +4,10 @@ Number of output #Z
 Number of States
 ============================Down here is state description=================
 =======For Moore==============
-State index, output
+State index, output0outpu1...
 (Next State index(decimal)) PairInput1Input2(binary) PairInput1Input2(binary) 
 (Next State index(decimal)) PairInput1Input2(binary) PairInput1Input2(binary) 
-State index, output
+State index, output0output1..
 (Next State index(decimal)) PairInput1Input2(binary) PairInput1Input2
 (Next State index(decimal)) PairInput1Input2(binary) PairInput1Input2
 ======For Mealy==============

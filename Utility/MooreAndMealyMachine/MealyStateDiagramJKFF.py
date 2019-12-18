@@ -1,5 +1,6 @@
 import math
 from functions import *
+DEBUG=False
 """
 State diagram representation
 
@@ -62,6 +63,7 @@ class MealyStateDiagram:
 			self._OutPrefix='Z'					# The prefix of output bits (Z0,Z1,..)
 			self._InpPrefix='X'					# The prefix of input bits (X0,X1,..)
 			self._IntBitPrefix='D'				# The prefix of internal bits (D0,D1,D2...) 
+			self._JKPrefix='JK'					# Prefix for output JK
 			self._mType="NotSet"
 			self._numState=0					# Number of State
 			self._numInp=0						# Number of inputs
@@ -101,8 +103,14 @@ class MealyStateDiagram:
 
 	def solveJKFF(self):
 		for i in range(self._numIntBit):
+			if DEBUG:
+				print("_JKBitTTB[i]['J']_107",self._JKBitTTb[i]['J'])
+			
 			self._SolvedExpr['J'+str(i)+'+']=self.solve4Logic(TTb=self._JKBitTTb[i]['J'])
 			self._SolvedExpr['K'+str(i)+'+']=self.solve4Logic(TTb=self._JKBitTTb[i]['K'])
+
+			if DEBUG:
+				print("self._SolvedExpr[K+]",self._SolvedExpr['K'+str(i)+'+'])
 
 	def nextJK(self,cI,nI):
 		if cI=='0' and nI=='0':
@@ -175,18 +183,35 @@ class MealyStateDiagram:
 		print('Main truth table')
 		self.printTTb(TTb=self._MainTTb,Labels=None)
 		print('Truth table of each variable and its expression')
+		if DEBUG:
+			print(self._SolvedExpr);
 		varSolved=list(self._SolvedExpr.keys())
 		varSolved.sort()	# Make them printed out in ascending order
 		for var in varSolved:
-			if var[0]==self._IntBitPrefix:
-				# This is an internal bit
+			if var[0] == self._IntBitPrefix:
+				# Do not print out the internal bit
+				# Since this is JK implementation
+				# No need to find expression for DFF
+				pass
+			elif var[0] in self._JKPrefix:
+				# This is an internal bit or J or K output
 				print('Variable {} :'.format(var))
-				print(self.toExpression(Terms=self._SolvedExpr[var],Labels=self.getBEL(int(var[1:-1]),outputBit=False)))
-				self.printTTb(TTb=self._IntBitTTb[int(var[1:-1])],Labels=self.getBEL(int(var[1:-1]),outputBit=False))
+				tmpLabels=self.getBEL(int(var[1:-1]),outputBit=False)
+				# Since the last element in tmpLabels will be internal bit D0 D1,.. something like that
+				# Take that internal bit out and replace by the JK label
+				tmpLabels.pop()
+				tmpLabels.append(var)
+				if DEBUG:
+					print('tmpLables_195',tmpLabels)
+					print('JKTTB',self._JKBitTTb[int(var[1:-1])][var[0]])
+				print(self.toExpression(Terms=self._SolvedExpr[var],Labels=tmpLabels))
+				self.printTTb(TTb=self._JKBitTTb[int(var[1:-1])][var[0]],Labels=tmpLabels)
 				print('\n\n')
 			else:
 				# This is an output bit
 				print('Variable {} :'.format(var))
+				if DEBUG:
+					print('var_192',var)
 				print(self.toExpression(Terms=self._SolvedExpr[var],Labels=self.getBEL(int(var[1:]),outputBit=True)))
 				self.printTTb(TTb=self._OutBitTTb[int(var[1:])],Labels=self.getBEL(int(var[1:]),outputBit=True))
 				print('\n\n')
@@ -388,7 +413,8 @@ class MealyStateDiagram:
 		else:
 			# No, you need to take of the '\n' in function[1]
 			function[1]=function[1][:-1]
-		print(function)
+		if DEBUG:
+			print(function)
 		expressionTerms = execute(function, size)
 #		printExpression(size, expressionTerms)
 		return expressionTerms
@@ -403,6 +429,9 @@ class MealyStateDiagram:
 		"""
 		exp='{} = '.format(Labels[-1])	# the front part of the expression
 		termList=[]
+		if len(Terms)==1 and Terms[0]=='----':
+			# When truth table is 1 or don't care for all entries
+			return exp+'1'
 		for t in Terms:					# Iterate through each term and decode
 			strTerm=''
 			for v in range(len(t)):
@@ -464,7 +493,7 @@ class MealyStateDiagram:
 
 #=====================================MainProgram=============================================
 # This is only to test this module, use main.py to run the correct diagram
-a=MealyStateDiagram('./test2.txt')
+a=MealyStateDiagram('./test8MeJK.txt')
 
 # labels=a.getFullLabels()
 # a.printTTb(TTb=a._MainTTb,Labels=None)

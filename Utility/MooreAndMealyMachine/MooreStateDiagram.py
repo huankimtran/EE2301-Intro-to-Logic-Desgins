@@ -386,6 +386,9 @@ class MooreStateDiagram:
 		"""
 		exp='{} = '.format(Labels[-1])	# the front part of the expression
 		termList=[]
+		if len(Terms)==1 and Terms[0]=='----':
+			# When truth table is 1 or don't care for all entries
+			return exp+'1'
 		for t in Terms:					# Iterate through each term and decode
 			strTerm=''
 			for v in range(len(t)):
