@@ -3,7 +3,7 @@ import MealyStateDiagramJKFF as MeJKFF
 import MooreStateDiagram as MoDFF
 
 # File to parse here
-stateDiagramDescriptionFile='./Test6.txt'
+stateDiagramDescriptionFile='./test6.txt'
 #stateDiagramDescriptionFile='./MoTest1.txt'
 
 

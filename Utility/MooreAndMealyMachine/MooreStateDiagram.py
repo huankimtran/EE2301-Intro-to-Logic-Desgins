@@ -454,7 +454,7 @@ class MooreStateDiagram:
 
 #=====================================MainProgram=============================================
 # This is only to test this module, use main.py to run the correct diagram
-a=MooreStateDiagram('./MoTest3.txt')
+#a=MooreStateDiagram('./MoTest3.txt')
 
 # labels=a.getFullLabels()
 # a.printTTb(TTb=a._MainTTb,Labels=None)

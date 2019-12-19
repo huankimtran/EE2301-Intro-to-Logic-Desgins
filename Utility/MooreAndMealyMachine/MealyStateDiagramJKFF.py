@@ -194,7 +194,7 @@ class MealyStateDiagram:
 				# No need to find expression for DFF
 				pass
 			elif var[0] in self._JKPrefix:
-				# This is an internal bit or J or K output
+				# This is a J or K output
 				print('Variable {} :'.format(var))
 				tmpLabels=self.getBEL(int(var[1:-1]),outputBit=False)
 				# Since the last element in tmpLabels will be internal bit D0 D1,.. something like that
@@ -493,7 +493,7 @@ class MealyStateDiagram:
 
 #=====================================MainProgram=============================================
 # This is only to test this module, use main.py to run the correct diagram
-a=MealyStateDiagram('./test8MeJK.txt')
+#a=MealyStateDiagram('./test8MeJK.txt')
 
 # labels=a.getFullLabels()
 # a.printTTb(TTb=a._MainTTb,Labels=None)
