@@ -1,2 +1,2 @@
 from CircuitTimer import *
-a=CircuitTimer('./Exam2.txt')
+a=CircuitTimer('./Test3.txt')
