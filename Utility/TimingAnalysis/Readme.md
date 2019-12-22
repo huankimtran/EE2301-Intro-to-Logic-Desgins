@@ -36,7 +36,7 @@ func_name{f1,f2,f3,f4,f5,f6,f7,f8}
 1,f8=AND(f7,x4)
 ```
 ### Notes:
-all logic functions AND(),OR(),NOR,etc can take multiple argument.
+all logic functions AND(),OR(),NOR,etc can take multiple arguments.
 For example, if a gate f is the function f=(a and b and c) or (c nor d nor k) or (d xor e xor m) with delay of 2 time units
 can be described as
 ```
