@@ -23,6 +23,7 @@ An example how to create a description file given below <br/>
 
 ![Image description](./ReadMeImg/Test3-4.png)
 
+The circuit above is described below </br>
 ```
 var_name{x1=1,x2=1,x3=1,x4=1}
 func_name{f1,f2,f3,f4,f5,f6,f7,f8}
