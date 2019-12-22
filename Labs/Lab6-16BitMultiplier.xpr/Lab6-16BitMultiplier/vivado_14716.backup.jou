@@ -1,0 +1,154 @@
+#-----------------------------------------------------------
+# Vivado v2019.1 (64-bit)
+# SW Build 2552052 on Fri May 24 14:49:42 MDT 2019
+# IP Build 2548770 on Fri May 24 18:01:18 MDT 2019
+# Start of session at: Mon Dec  2 08:04:35 2019
+# Process ID: 14716
+# Current directory: C:/Users/tran0966/Downloads/Lab6-16BitMultiplier.xpr/Lab6-16BitMultiplier
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent16028 C:\Users\tran0966\Downloads\Lab6-16BitMultiplier.xpr\Lab6-16BitMultiplier\Lab6-16BitMultiplier.xpr
+# Log file: C:/Users/tran0966/Downloads/Lab6-16BitMultiplier.xpr/Lab6-16BitMultiplier/vivado.log
+# Journal file: C:/Users/tran0966/Downloads/Lab6-16BitMultiplier.xpr/Lab6-16BitMultiplier\vivado.jou
+#-----------------------------------------------------------
+start_gui
+open_project C:/Users/tran0966/Downloads/Lab6-16BitMultiplier.xpr/Lab6-16BitMultiplier/Lab6-16BitMultiplier.xpr
+update_compile_order -fileset sources_1
+reset_run synth_1
+launch_runs synth_1 -jobs 12
+wait_on_run synth_1
+reset_run synth_1
+launch_runs synth_1 -jobs 12
+wait_on_run synth_1
+launch_runs impl_1 -jobs 12
+wait_on_run impl_1
+reset_run synth_1
+launch_runs synth_1 -jobs 12
+wait_on_run synth_1
+reset_run synth_1
+launch_runs synth_1 -jobs 12
+wait_on_run synth_1
+reset_run synth_1
+launch_runs synth_1 -jobs 12
+wait_on_run synth_1
+reset_run synth_1
+launch_runs synth_1 -jobs 12
+wait_on_run synth_1
+update_compile_order -fileset sources_1
+reset_run synth_1
+launch_runs synth_1 -jobs 12
+wait_on_run synth_1
+reset_run synth_1
+launch_runs synth_1 -jobs 12
+wait_on_run synth_1
+reset_run synth_1
+launch_runs synth_1 -jobs 12
+wait_on_run synth_1
+reset_run synth_1
+launch_runs impl_1 -jobs 12
+wait_on_run impl_1
+reset_run synth_1
+launch_runs synth_1 -jobs 12
+wait_on_run synth_1
+launch_runs impl_1 -jobs 12
+wait_on_run impl_1
+launch_simulation
+source sim_MULTIPLIER_16.tcl
+close_sim
+launch_simulation
+source sim_MULTIPLIER_16.tcl
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top sim_COUNTER_17 [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+update_compile_order -fileset sim_1
+close_sim
+launch_simulation
+launch_simulation
+close_project
+open_project C:/Users/tran0966/Downloads/Lab6-16BitMultiplier.xpr/Lab6-16BitMultiplier/Lab6-16BitMultiplier.xpr
+launch_simulation
+update_compile_order -fileset sources_1
+launch_simulation
+launch_simulation
+source sim_COUNTER_17.tcl
+close_sim
+launch_simulation
+source sim_COUNTER_17.tcl
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top sim_MULTIPLIER_16 [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+update_compile_order -fileset sim_1
+close_sim
+launch_simulation
+source sim_MULTIPLIER_16.tcl
+set_property SOURCE_SET sources_1 [get_filesets sim_1]
+close [ open C:/Users/tran0966/Downloads/Lab6-16BitMultiplier.xpr/Lab6-16BitMultiplier/Lab6-16BitMultiplier.srcs/sim_1/new/sim_MULTIPLIER_16_internal.v w ]
+add_files -fileset sim_1 C:/Users/tran0966/Downloads/Lab6-16BitMultiplier.xpr/Lab6-16BitMultiplier/Lab6-16BitMultiplier.srcs/sim_1/new/sim_MULTIPLIER_16_internal.v
+update_compile_order -fileset sim_1
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top sim_MULTIPLIER_16_internal [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+launch_simulation
+update_compile_order -fileset sim_1
+close_sim
+launch_simulation
+source sim_MULTIPLIER_16_internal.tcl
+set_property SOURCE_SET sources_1 [get_filesets sim_1]
+close [ open C:/Users/tran0966/Downloads/Lab6-16BitMultiplier.xpr/Lab6-16BitMultiplier/Lab6-16BitMultiplier.srcs/sim_1/new/sim_SHIFTREGISTER_17.v w ]
+add_files -fileset sim_1 C:/Users/tran0966/Downloads/Lab6-16BitMultiplier.xpr/Lab6-16BitMultiplier/Lab6-16BitMultiplier.srcs/sim_1/new/sim_SHIFTREGISTER_17.v
+update_compile_order -fileset sim_1
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top sim_SHIFTREGISTER_17 [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+update_compile_order -fileset sim_1
+launch_simulation
+close_sim
+launch_simulation
+launch_simulation
+launch_simulation
+source sim_SHIFTREGISTER_17.tcl
+close_sim
+launch_simulation
+launch_simulation
+source sim_SHIFTREGISTER_17.tcl
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top sim_SHIFTREGISTER_8 [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+update_compile_order -fileset sim_1
+close_sim
+launch_simulation
+launch_simulation
+source sim_SHIFTREGISTER_8.tcl
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top sim_MULTIPLIER_16 [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+launch_simulation
+update_compile_order -fileset sim_1
+close_sim
+launch_simulation
+source sim_MULTIPLIER_16.tcl
+reset_run synth_1
+launch_runs synth_1 -jobs 12
+wait_on_run synth_1
+launch_runs impl_1 -jobs 12
+wait_on_run impl_1
+open_run impl_1
+launch_runs impl_1 -to_step write_bitstream -jobs 12
+wait_on_run impl_1
+archive_project C:/Users/tran0966/Downloads/Lab6-16BitMultiplier.xpr/Lab6-16BitMultiplier.xpr.zip -temp_dir C:/Users/tran0966/Downloads/Lab6-16BitMultiplier.xpr/Lab6-16BitMultiplier/.Xil/Vivado-14716-ECE-LAB108 -force -include_local_ip_cache -include_config_settings

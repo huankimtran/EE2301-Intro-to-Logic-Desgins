@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2019.1 (64-bit)
+# SW Build 2552052 on Fri May 24 14:49:42 MDT 2019
+# IP Build 2548770 on Fri May 24 18:01:18 MDT 2019
+# Start of session at: Mon Dec  2 10:00:17 2019
+# Process ID: 3804
+# Current directory: C:/Users/tran0966/Downloads/Lab6-16BitMultiplier.xpr/Lab6-16BitMultiplier/Lab6-16BitMultiplier.runs/impl_1
+# Command line: vivado.exe -log MULTIPLIER_16.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source MULTIPLIER_16.tcl -notrace
+# Log file: C:/Users/tran0966/Downloads/Lab6-16BitMultiplier.xpr/Lab6-16BitMultiplier/Lab6-16BitMultiplier.runs/impl_1/MULTIPLIER_16.vdi
+# Journal file: C:/Users/tran0966/Downloads/Lab6-16BitMultiplier.xpr/Lab6-16BitMultiplier/Lab6-16BitMultiplier.runs/impl_1\vivado.jou
+#-----------------------------------------------------------
+source MULTIPLIER_16.tcl -notrace

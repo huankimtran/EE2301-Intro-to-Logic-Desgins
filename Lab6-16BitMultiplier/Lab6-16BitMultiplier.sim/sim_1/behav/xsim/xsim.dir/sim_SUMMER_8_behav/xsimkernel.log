@@ -1,7 +1,0 @@
-Running: xsim.dir/sim_SUMMER_8_behav/xsimk.exe -simmode gui -wdb sim_SUMMER_8_behav.wdb -simrunnum 0 -socket 60235
-Design successfully loaded
-Design Loading Memory Usage: 5248 KB (Peak: 5248 KB)
-Design Loading CPU Usage: 15 ms
-Simulation completed
-Simulation Memory Usage: 5892 KB (Peak: 5892 KB)
-Simulation CPU Usage: 15 ms
