@@ -6,7 +6,7 @@ Read the Circuit Description file or the instruction below to know how to descri
 ```
 # Lines starting with # are comments
 #===================Define=Variables====================
-# Variable name INCLUDING function name separate by comas , form = letters (and or number) no space, Function name set to u
+# Variable name INCLUDING function name separate by comas , form = letters (and or number) no space
 
 var_name{var0_name=initial_value,var1_name=initial_value,...}	
 func_name{func0_name,func_1_name}	
@@ -23,7 +23,7 @@ An example how to create a description file given below <br/>
 
 ![Image description](./ReadMeImg/Test3-4.png)
 
-The circuit above is described below </br>
+### The circuit above is described below </br>
 ```
 var_name{x1=1,x2=1,x3=1,x4=1}
 func_name{f1,f2,f3,f4,f5,f6,f7,f8}
@@ -36,7 +36,14 @@ func_name{f1,f2,f3,f4,f5,f6,f7,f8}
 1,f7=AND(x3,f6)
 1,f8=AND(f7,x4)
 ```
-To run the timing analysis:
+### Notes:
+all logic functions AND(),OR(),NOR,etc can take multiple argument.
+For example, if a gate f is the function f=(a and b and c) or (c nor d nor k) or (d xor e xor m)
+can be described as
+```
+f=OR(AND(a,b,c),NOR(c,d,k),XOR(d,e,m))
+```
+### To run the timing analysis:
 * Save the description into a file with your choice of name
 * Modify the path in main.py to point to your file
 * Run python3 main.py in this folder to obtain the arrival time table
