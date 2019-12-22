@@ -18,9 +18,8 @@ delay,func0_name=And(XOR(var0_name,var1_name,..),OR(var1_name,var2_name))	#defin
 delay,func1_name=....
 
 ```
-An example how to create a description file given below <br/>
-<br/>
-
+## An example how to create a description file given below <br/>
+Assuming all gates has delay of 1 time unit except f2 has delay of 2 time units and f3 has delay of 4 time units.
 ![Image description](./ReadMeImg/Test3-4.png)
 
 ### The circuit above is described below </br>
@@ -28,8 +27,8 @@ An example how to create a description file given below <br/>
 var_name{x1=1,x2=1,x3=1,x4=1}
 func_name{f1,f2,f3,f4,f5,f6,f7,f8}
 1,f1=NOR(x1,f8)
-1,f2=NAND(x2,f1)
-1,f3=NAND(x3,f2)
+2,f2=NAND(x2,f1)
+4,f3=NAND(x3,f2)
 1,f4=NOR(f3,x4)
 1,f5=OR(x1,f4)
 1,f6=OR(x2,f5)
@@ -38,10 +37,10 @@ func_name{f1,f2,f3,f4,f5,f6,f7,f8}
 ```
 ### Notes:
 all logic functions AND(),OR(),NOR,etc can take multiple argument.
-For example, if a gate f is the function f=(a and b and c) or (c nor d nor k) or (d xor e xor m)
+For example, if a gate f is the function f=(a and b and c) or (c nor d nor k) or (d xor e xor m) with delay of 2 time units
 can be described as
 ```
-f=OR(AND(a,b,c),NOR(c,d,k),XOR(d,e,m))
+2,f=OR(AND(a,b,c),NOR(c,d,k),XOR(d,e,m))
 ```
 ### To run the timing analysis:
 * Save the description into a file with your choice of name
