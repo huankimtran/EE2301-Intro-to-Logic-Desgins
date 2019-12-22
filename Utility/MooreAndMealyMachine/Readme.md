@@ -1,1 +1,1 @@
-This utility helps with converting a stage diagram of either Moore or Mealy machine to their logic gate implementations (Logic expressions, etc)
+This utility helps with converting a stage diagram of either Moore or Mealy machine to their logic gate implementations (Logic expressions, etc) using JKFF, DFF. Utility can also test your state diagram given a sample input/output sequences
